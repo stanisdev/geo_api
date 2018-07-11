@@ -1,0 +1,11 @@
+const http = require('http');
+const app = require('../app');
+const config = require(process.env.CONFIG_PATH);
+
+const port = parseInt(process.env.PORT, 10) || config.port_default;
+app.set('port', port);
+
+const server = http.createServer(app);
+server.listen(port, () => {
+  console.log(`Geo api listening on port ${port}`);
+});
