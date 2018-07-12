@@ -65,7 +65,9 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
   User.associate = function(models) {
-    // associations can be defined here
+    User.hasMany(models.UserCash, {
+      foreignKey: 'user_id',
+    });
   };
   User.register = async function(body) {
     const data = only(body, 'name email password tarif');

@@ -70,9 +70,8 @@ router.post('/auth', wrapper(async (req, res, next) => {
   } catch(err) {
     return next(err);
   }
-  result = only(result, 'id access_token refresh_token access_token_expired refresh_token_expired');
   result.session_id = result.id;
-  delete result.id;
+  result = only(result, 'session_id access_token refresh_token access_token_expired refresh_token_expired');
   res.json({
     success: true,
     data: result,

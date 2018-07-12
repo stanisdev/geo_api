@@ -22,4 +22,5 @@ module.exports = {
       db: 0,
     },
   },
+  cost_paid_account_per_day: 10,
 };
