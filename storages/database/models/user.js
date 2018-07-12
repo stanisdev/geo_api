@@ -32,13 +32,22 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    state: {
+    state: { // 0 - not activated, 1 - activated
       type: DataTypes.SMALLINT,
       defaultValue: 1,
       validate: {
         isInt: true,
         max: 32767,
         min: -32768,
+      },
+    },
+    tariff: { // 1 - free, 2 - paid
+      type: DataTypes.SMALLINT,
+      allowNull: false,
+      validate: {
+        isInt: true,
+        min: 1,
+        max: 2,
       },
     },
     password: {
@@ -59,7 +68,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
   };
   User.register = async function(body) {
-    const data = only(body, 'name email password');
+    const data = only(body, 'name email password tarif');
     let user;
     try {
       user = User.build(body);
@@ -92,6 +101,10 @@ module.exports = (sequelize, DataTypes) => {
 
     const hash = await bcrypt.hash(data, 10);
     return {hash, salt};
+  };
+  User.prototype.checkPassword = function(password) {
+    const data = password + this.salt;
+    return bcrypt.compare(data, this.password);
   };
   return User;
 };

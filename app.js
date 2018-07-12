@@ -14,7 +14,6 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-process.env.CONFIG_PATH = configPath;
 process.env.APP_FILE_PATH = path.join(__dirname, '/app.js');
 process.env.DATABASE_PATH = config.database_path;
 module.exports = app;

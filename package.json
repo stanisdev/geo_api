@@ -30,10 +30,12 @@
     "helmet": "^3.12.1",
     "joi": "^13.4.0",
     "morgan": "^1.9.0",
+    "nohm": "^2.0.1",
     "only": "0.0.2",
     "pg": "^7.4.3",
     "pg-hstore": "^2.3.2",
     "randomstring": "^1.1.5",
+    "redis": "^2.8.0",
     "sequelize": "^4.38.0",
     "sequelize-cli": "^4.0.0"
   },

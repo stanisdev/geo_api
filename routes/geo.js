@@ -18,7 +18,12 @@ router.post('/',
   if (!(data instanceof Object)) {
     return res.json({
       success: false,
-      message: 'IP address does not belong to any country',
+      errors: {
+        fields: {
+          ip: 'IP address does not belong to any country',
+        },
+        type: 'VALIDATION_ERROR',
+      },
     });
   }
   return res.json({

@@ -18,7 +18,7 @@ module.exports = {
       },
       state: {
         type: Sequelize.SMALLINT,
-        defaultValue: 1, // 0 - not activated, 1 - free, 2 - paid
+        defaultValue: 1, // 0 - not activated, 1 - activated
         allowNull: false,
       },
       password: {

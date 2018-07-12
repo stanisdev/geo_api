@@ -14,7 +14,9 @@ module.exports = wrapper(async (req, res, next) => {
   } catch (err) {
     return res.json({
       success: false,
-      message: 'You are not authorized',
+      errors: {
+        type: 'NOT_AUTHORIZED',
+      },
     })
   }
   next();

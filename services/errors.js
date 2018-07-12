@@ -7,7 +7,9 @@ module.exports = () => {
   app.use((req, res, next) => {
     res.json({
       success: false,
-      message: 'Not found',
+      errors: {
+        type: 'NOT_FOUND',
+      },
     });
   });
 
@@ -18,7 +20,10 @@ module.exports = () => {
     console.log(err.stack);
     res.status(err.status || 500).json({
       success: false,
-      message: 'An unexpected error occurred',
+      errors: {
+        message: 'An unexpected error occurred',
+        type: 'SERVER_ERROR',
+      },
     });
   });
 };

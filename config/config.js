@@ -9,6 +9,17 @@ module.exports = {
   filters_path: path.join(rootDir, '/filters'),
   database_path: path.join(rootDir, '/storages/database/models'),
   registration_required: true,
-  auth_token_length: 40,
+  access_token_length: 25,
   refresh_token_length: 40,
+  access_token_expired: 86400000, // сутки
+  refresh_token_expired: 86400000 * 30, // месяц
+  redis: {
+    client_path: path.join(rootDir, '/storages/redisClient'),
+    connection: {
+      host: '127.0.0.1',
+      password: undefined,
+      port: 6379,
+      db: 0,
+    },
+  },
 };

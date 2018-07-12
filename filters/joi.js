@@ -16,7 +16,12 @@ module.exports = {
       if (result.error !== null) {
         return res.json({
           success: false,
-          message: 'Invalid IP address value',
+          errors: {
+            fields: {
+              ip: 'Invalid IP address value',
+            },
+            type: 'VALIDATION_ERROR',
+          },
         });
       }
       next();

@@ -1,11 +1,22 @@
 const http = require('http');
-const app = require('../app');
-const config = require(process.env.CONFIG_PATH);
+const path = require('path');
+const rootDir = path.dirname(__dirname);
+const configPath = path.join(rootDir, '/config/config.js');
+const config = require(configPath);
 
-const port = parseInt(process.env.PORT, 10) || config.port_default;
-app.set('port', port);
+process.env.CONFIG_PATH = configPath;
+const redisClient = require(config.redis.client_path);
 
-const server = http.createServer(app);
-server.listen(port, () => {
-  console.log(`Geo api listening on port ${port}`);
-});
+redisClient
+  .then((client) => {
+    const app = require('../app');
+    const port = parseInt(process.env.PORT, 10) || config.port_default;
+    app.set('redis', client);
+    app.set('port', port);
+
+    const server = http.createServer(app);
+    server.listen(port, () => {
+      console.log(`Geo api listening on port ${port}`);
+    });
+  })
+  .catch(console.error);
