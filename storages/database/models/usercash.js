@@ -40,11 +40,13 @@ module.exports = (sequelize, DataTypes) => {
     const now = Date.now();
     const expired = cashService.сalculatePaidAccountExpiration(amount);
     if (!(cash instanceof Object)) { // Создать в первый раз
-      return sequelize.transaction((t) => {
+      const expiredDate = now + expired;
+
+      await sequelize.transaction((t) => {
         return UserCash.create({ // Счет
           user_id: userId,
           cash_count: amount,
-          expired: new Date(now + expired),
+          expired: new Date(expiredDate),
         }, {transaction: t}).then((cashAccount) => {
           return sequelize.models.СashOperation.create({ // Лог
             cash_account_id: cashAccount.get('id'),
@@ -53,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
           }, {transaction: t});
         });
       });
+      return {expiredDate};
     }
     // Уеличить
     const increased = cash.get('cash_count') + amount;
@@ -62,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
     // то прибавить к ней expired. Если меньше, то прибавить expired к текущей. 
     const expiredDate = (date > now ? date : now) + expired; 
     
-    return sequelize.transaction((t) => {
+    await sequelize.transaction((t) => {
       return cash.set({
         cash_count: increased,
         expired: new Date(expiredDate),
@@ -75,6 +78,7 @@ module.exports = (sequelize, DataTypes) => {
           }, {transaction: t});
         });
     });
+    return {expiredDate};
   };
   return UserCash;
 };

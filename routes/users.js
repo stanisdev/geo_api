@@ -55,26 +55,57 @@ router.post('/auth', wrapper(async (req, res, next) => {
   if (!isValid) {
     return authFailed();
   }
-  const now = Date.now();
+  const redis = app.get('redis');
+  const tokens = redis.UserToken.methods.generateTokens();
   const userTokens = {
+    ...tokens,
     user_id: user.get('id'),
-    access_token: randomString.generate(config.access_token_length),
-    refresh_token: randomString.generate(config.refresh_token_length),
-    access_token_expired: now + config.access_token_expired,
-    refresh_token_expired: now + config.refresh_token_expired,
     tariff: user.get('tariff'),
   };
-  let result;
   try {
     result = await app.get('redis').UserToken.methods.addUser(userTokens);
+    tokens.session_id = result.id;
   } catch(err) {
     return next(err);
   }
-  result.session_id = result.id;
-  result = only(result, 'session_id access_token refresh_token access_token_expired refresh_token_expired');
   res.json({
     success: true,
-    data: result,
+    data: tokens,
+  });
+}));
+
+/**
+ * Update access and refresh tokens
+ */
+// @TODO Add Joi validator
+router.post('/update_tokens', wrapper(async (req, res, next) => {
+  const {body} = req;
+  const refreshToken = body.refresh_token;
+  const redis = app.get('redis');
+  let userTokens;
+  try {
+    userTokens = await redis.UserToken.methods.findById(body.session_id);
+    if (refreshToken !== userTokens.property('refresh_token')) { // Неверный Refresh токен
+      throw new Error('Invalid refresh token');
+    }
+    if (Date.now() >= userTokens.property('refresh_token_expired')) { // Refresh токен истек, удалить
+      await userTokens.remove();
+      throw new Error('Refresh token expired');
+    }
+  } catch (err) {
+    return res.json({
+      success: false,
+      errors: {
+        type: 'CAN_NOT_UPDATE_TOKENS',
+      },
+    });
+  }
+  const newTokens = redis.UserToken.methods.generateTokens(); // Обновим токены
+  userTokens.property(newTokens);
+  await userTokens.save();
+  return res.json({
+    success: true,
+    data: newTokens,
   });
 }));
 

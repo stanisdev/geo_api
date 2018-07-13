@@ -17,9 +17,15 @@ router.post('/deposit',
   filters.users.findUser,
   wrapper(async (req, res, next) => {
   const userId = req.user.get('id');
-  await db.UserCash.deposit(userId, req.body.amount);
+  const {expiredDate} = await db.UserCash.deposit(userId, req.body.amount);
+  
+  // Продлить дату истечения платного аккаунта в Redis
+  await app.get('redis').UserToken.methods.updatePropertiesById(req.userTokens.id, {
+    paid_account_expired: expiredDate,
+  });
   res.json({
     success: true,
+    expiredDate,
   });
 }));
 
