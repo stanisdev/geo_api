@@ -10,11 +10,11 @@ const db = require(process.env.DATABASE_PATH);
 /**
  * Внесение денег на счет. Метод эмулирующий такого рода операцию
  */
-// @TODO Add Joi validator (amount)
-// @TODO проверка, что бы вносимая сумма была не меньше чем на 1 сутки
-router.post('/deposit', 
+// @TODO проверка, что аккаунт должен относиться к платному
+router.post('/deposit',
   filters.auth,
   filters.users.findUser,
+  filters.joi.post.deposit,
   wrapper(async (req, res, next) => {
   const userId = req.user.get('id');
   const {expiredDate} = await db.UserCash.deposit(userId, req.body.amount);
@@ -25,7 +25,6 @@ router.post('/deposit',
   });
   res.json({
     success: true,
-    expiredDate,
   });
 }));
 

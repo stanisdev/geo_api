@@ -3,6 +3,7 @@ const router = express.Router();
 const app = require(process.env.APP_FILE_PATH);
 const config = require(process.env.CONFIG_PATH);
 const {wrapper} = require(config.services_path);
+const filters = require(config.filters_path);
 const db = require(config.database_path);
 const only = require('only');
 
@@ -27,8 +28,9 @@ router.post('/registration', wrapper(async (req, res, next) => {
 /**
  * Authorization
  */
-// @TODO Add Joi validator
-router.post('/auth', wrapper(async (req, res, next) => {
+router.post('/auth', 
+  filters.joi.post.checkAuthData, 
+  wrapper(async (req, res, next) => {
   const {body} = req;
   const user = await db.User.findOne({
     where: {
@@ -79,9 +81,11 @@ router.post('/auth', wrapper(async (req, res, next) => {
 /**
  * Update access and refresh tokens
  */
-// @TODO Add Joi validator
-router.post('/update_tokens', wrapper(async (req, res, next) => {
+router.post('/update_tokens', 
+  filters.joi.post.checkTokensCorrectness,
+  wrapper(async (req, res, next) => {
   const {body} = req;
+
   const refreshToken = body.refresh_token;
   const redis = app.get('redis');
   let userTokens;
@@ -108,6 +112,16 @@ router.post('/update_tokens', wrapper(async (req, res, next) => {
   return res.json({
     success: true,
     data: newTokens,
+  });
+}));
+
+/**
+ * Logout
+ */
+router.get('/logout', filters.auth, wrapper(async (req, res, next) => {
+  await req.userTokens.remove();
+  return res.json({
+    success: true,
   });
 }));
 

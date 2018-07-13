@@ -11,7 +11,7 @@ class AuthFilter {
     this.res = res;
     this.next = next;
     this.token = req.headers['x-auth-token'];
-    this.sessionId = req.headers['session_id'];
+    this.sessionId = req.headers['session-id'];
     this.redis = app.get('redis');
     this.now = Date.now();
   }

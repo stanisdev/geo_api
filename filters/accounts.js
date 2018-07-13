@@ -1,6 +1,7 @@
 const config = require(process.env.CONFIG_PATH);
 const {wrapper} = require(config.services_path);
 const app = require(process.env.APP_FILE_PATH);
+const db = require(config.database_path);
 
 class AccountsFilter {
   /**
@@ -11,7 +12,7 @@ class AccountsFilter {
     this.res = res;
     this.next = next;
     this.token = req.headers['x-auth-token'];
-    this.sessionId = req.headers['session_id'];
+    this.sessionId = req.headers['session-id'];
     this.redis = app.get('redis');
     this.now = Date.now();
     this.userTokens = req.userTokens;
@@ -34,8 +35,8 @@ class AccountsFilter {
       const cash = await db.UserCash.findOne({
         where: {
           user_id: this.userTokens.property('user_id'),
-          attributes: ['expired'],
         },
+        attributes: ['id', 'expired', 'cash_count'],
       });
       if (!(cash instanceof Object)) {
         return this.fundAccount();
@@ -46,11 +47,25 @@ class AccountsFilter {
           paid_account_expired: expired,
         });
       }
-      else {
+      else { // Списать сумму со счета
+        await this.decreaseCash(cash);
         return this.paidAccountExpired();
       }
     }
     this.done();
+  }
+  /**
+   * Decrease cash
+   */
+  decreaseCash(cash) {
+    const count = cash.get('cash_count');
+    if (count < config.cost_paid_account_per_day) { // Уже списано
+      return Promise.resolve();
+    }
+    // Оставить остаток, (сумма меньше, чем способная погасить оплату
+    // пользования платным аккаунтом за сутки)
+    const remainder = count % config.cost_paid_account_per_day;
+    return cash.set('cash_count', remainder).save();
   }
   /**
    * Check free account limit on requests
@@ -62,12 +77,7 @@ class AccountsFilter {
       await this.extendRequestCounting();
     }
     else if (counter >= config.requests_per_hour_for_free_account) { // Превышено
-      this.res.json({
-        success: false,
-        errors: {
-          type: 'EXCEEDED_REQUESTS_NUMBER_PER_HOUR',
-        },
-      });
+      this.exceededRequestsLimit();
       return false;
     }
     else { // Накрутить счетчик запросов
@@ -100,6 +110,17 @@ class AccountsFilter {
   done() {
     this.req.userTokens = this.userTokens;
     this.next();
+  }
+  /**
+   * Exceeded requests limit
+   */
+  exceededRequestsLimit() {
+    this.res.json({
+      success: false,
+      errors: {
+        type: 'EXCEEDED_REQUESTS_NUMBER_PER_HOUR',
+      },
+    });
   }
   /**
    * Not authorized response

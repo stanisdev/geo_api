@@ -70,10 +70,10 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
   User.register = async function(body) {
-    const data = only(body, 'name email password tarif');
+    const data = only(body, 'name email password tariff');
     let user;
     try {
-      user = User.build(body);
+      user = User.build(data);
       await user.validate();
     } catch (err) {
       return {
@@ -99,9 +99,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   User.cryptPassword = async function(password) {
     const salt = randomString.generate(10);
-    const data = password + salt;
-
-    const hash = await bcrypt.hash(data, 10);
+    const hash = await bcrypt.hash(password + salt, 10);
     return {hash, salt};
   };
   User.prototype.checkPassword = function(password) {
