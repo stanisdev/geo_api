@@ -23,4 +23,5 @@ module.exports = {
     },
   },
   cost_paid_account_per_day: 10,
+  requests_per_hour_for_free_account: 5,
 };

@@ -11,9 +11,9 @@ const geoip = require('geoip-lite');
 router.post('/', 
   filters.joi.post.validateIp,
   filters.auth,
+  filters.accounts,
   (req, res, next) => {
-  const {ip} = req.body;
-  const data = geoip.lookup(ip);
+  const data = geoip.lookup(req.body.ip);
 
   if (!(data instanceof Object)) {
     return res.json({

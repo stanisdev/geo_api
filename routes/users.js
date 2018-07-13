@@ -4,9 +4,7 @@ const app = require(process.env.APP_FILE_PATH);
 const config = require(process.env.CONFIG_PATH);
 const {wrapper} = require(config.services_path);
 const db = require(config.database_path);
-const filters = require(config.filters_path);
 const only = require('only');
-const randomString = require('randomstring');
 
 /**
  * Registration
@@ -62,6 +60,10 @@ router.post('/auth', wrapper(async (req, res, next) => {
     user_id: user.get('id'),
     tariff: user.get('tariff'),
   };
+  if (user.isFreeAccount()) {
+    userTokens.request_counter = 0;
+    userTokens.сounting_requests_from = Date.now() + 3600000;
+  }
   try {
     result = await app.get('redis').UserToken.methods.addUser(userTokens);
     tokens.session_id = result.id;

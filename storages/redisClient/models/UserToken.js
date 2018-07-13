@@ -25,6 +25,12 @@ const model = nohm.model('UserToken', {
     },
     paid_account_expired: {
       type: 'timestamp',
+    },
+    request_counter: { // Счетчик запросов для бесплатного аккаунта
+      type: 'integer',
+    },
+    сounting_requests_from: { // Отсчет запросов от текущей метки
+      type: 'timestamp',
     }
   },
   client,

@@ -108,5 +108,8 @@ module.exports = (sequelize, DataTypes) => {
     const data = password + this.salt;
     return bcrypt.compare(data, this.password);
   };
+  User.prototype.isFreeAccount = function() {
+    return this.tariff === 1;
+  }
   return User;
 };
