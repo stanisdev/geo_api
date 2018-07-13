@@ -64,11 +64,21 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
   }, {});
+  /**
+   * Associations
+   * 
+   * @param {Object} models
+   */
   User.associate = function(models) {
     User.hasMany(models.UserCash, {
       foreignKey: 'user_id',
     });
   };
+  /**
+   * Registr user
+   * 
+   * @param {Object} body 
+   */
   User.register = async function(body) {
     const data = only(body, 'name email password tariff');
     let user;
@@ -97,15 +107,28 @@ module.exports = (sequelize, DataTypes) => {
     }
     return {ok: true};
   };
+  /**
+   * Crypt password
+   * 
+   * @param {string} password 
+   */
   User.cryptPassword = async function(password) {
     const salt = randomString.generate(10);
     const hash = await bcrypt.hash(password + salt, 10);
     return {hash, salt};
   };
+  /**
+   * Check password hash
+   * 
+   * @param {string} password 
+   */
   User.prototype.checkPassword = function(password) {
     const data = password + this.salt;
     return bcrypt.compare(data, this.password);
   };
+  /**
+   * Determine free account
+   */
   User.prototype.isFreeAccount = function() {
     return this.tariff === 1;
   }

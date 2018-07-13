@@ -11,5 +11,16 @@ module.exports = {
     }
     req.user = user;
     next();
-  })
+  }),
+  paidAccountOnly(req, res, next) {
+    if (req.user.isFreeAccount()) {
+      return res.json({
+        success: false,
+        errors: {
+          type: 'PAID_ACCOUNT_ONLY',
+        }
+      });
+    }
+    next();
+  }
 };

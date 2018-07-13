@@ -14,15 +14,15 @@ const db = require(process.env.DATABASE_PATH);
 router.post('/deposit',
   filters.auth,
   filters.users.findUser,
+  filters.users.paidAccountOnly,
   filters.joi.post.deposit,
   wrapper(async (req, res, next) => {
   const userId = req.user.get('id');
   const {expiredDate} = await db.UserCash.deposit(userId, req.body.amount);
   
   // Продлить дату истечения платного аккаунта в Redis
-  await app.get('redis').UserToken.methods.updatePropertiesById(req.userTokens.id, {
-    paid_account_expired: expiredDate,
-  });
+  req.userTokens.property({ paid_account_expired: expiredDate });
+  await req.userTokens.save();
   res.json({
     success: true,
   });

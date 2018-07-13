@@ -43,9 +43,8 @@ class AccountsFilter {
       }
       const expired = new Date(cash.get('expired')).getTime();
       if (expired > this.now) { // Да, пользование платным аккаунтом продлено
-        await this.redis.UserToken.methods.updatePropertiesById(this.sessionId, {
-          paid_account_expired: expired,
-        });
+        this.userTokens.property({ paid_account_expired: expired });
+        await this.userTokens.save();
       }
       else { // Списать сумму со счета
         await this.decreaseCash(cash);

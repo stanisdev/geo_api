@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {});
+  /**
+   * Associations
+   * 
+   * @param {Object} models
+   */
   СashOperation.associate = function(models) {
     СashOperation.belongsTo(models.UserCash, {
       foreignKey: 'cash_account_id',

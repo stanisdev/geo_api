@@ -24,36 +24,8 @@ module.exports = new Promise((res, rej) => {
           [modelName]: require(currModel),
         };
       }, {});
-      
-      // models.UserToken.methods.addUser({
-      //   user_id: 10,
-      //   access_token: 'EIOIEOQIOEQI',
-      // });
       console.log('Redis Client was connected successfully');
       res(models);
-    
-    
-      // const data = await models['Name'].find();
-      // console.log(data);
-    
-      // const user = new User();
-      // const data = await user.load('54946090-859d-11e8-990d-59e5e693dc92');
-      // console.log(data);
-    
-      // const user = new User();
-      // user.property({
-      //   user_id: 10,
-      //   email: 'john@example.com',
-      // });
-      // try {
-      //   const d = await user.save();
-      //   console.log('SAVED');
-      //   console.log(user.allPropertiesCache);
-      // } catch (error) {
-      //   if (error instanceof nohm.ValidationError) {
-      //     console.log(error);
-      //   }
-      // }
     });
   } catch (err) {
     rej(err);

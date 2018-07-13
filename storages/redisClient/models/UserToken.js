@@ -39,6 +39,11 @@ const model = nohm.model('UserToken', {
 module.exports = {
   model,
   methods: {
+    /**
+     * Add user's tokens to redis
+     * 
+     * @param {Object} data
+     */
     addUser(data) {
       return new Promise(async (res, rej) => {
         const instance = new model();
@@ -51,17 +56,19 @@ module.exports = {
         }
       });
     },
-    async updatePropertiesById(id, properties) {
-      const instance = new model();
-      await instance.load(id);
-      instance.property(properties);
-      return await instance.save();
-    },
+    /**
+     * Find record by id
+     * 
+     * @param {number} id
+     */
     async findById(id) {
       const instance = new model();
       await instance.load(id);
       return instance;
     },
+    /**
+     * Generate object containing tokens
+     */
     generateTokens() {
       const now = Date.now();
       return {

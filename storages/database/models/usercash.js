@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {});
+  /**
+   * Associations
+   * 
+   * @param {Object} models
+   */
   UserCash.associate = function(models) {
     UserCash.belongsTo(models.User, {
       foreignKey: 'user_id',
@@ -31,6 +36,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'cash_account_id',
     });
   };
+  /**
+   * Deposit cash
+   * 
+   * @param {number} userId 
+   * @param {number} amount 
+   */
   UserCash.deposit = async function(userId, amount) {
     const cash = await UserCash.findOne({
       where: {
