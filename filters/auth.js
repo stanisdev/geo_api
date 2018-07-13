@@ -37,7 +37,7 @@ class AuthFilter {
       return this.notAuthorized();
     }
     if (this.now >= +this.userTokens.property('access_token_expired')) { // Токен истек, удалить запись в Redis
-      await UserToken.remove(this.sessionId);
+      await this.userTokens.remove();
       return this.notAuthorized();
     }
     this.req.userTokens = this.userTokens;

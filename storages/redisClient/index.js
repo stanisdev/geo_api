@@ -13,10 +13,6 @@ module.exports = new Promise((res, rej) => {
       nohm.setPrefix('geo');
       nohm.setClient(redisClient);
     
-      module.exports = {
-        client: redisClient,
-      };
-    
       let models = glob.sync(path.join(__dirname, '/models/*.js'));
       models = models.reduce((models, currModel) => {
         const modelName = path.basename(currModel, '.js');
