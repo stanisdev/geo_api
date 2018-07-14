@@ -69,6 +69,7 @@ router.post('/auth',
   try {
     result = await app.get('redis').UserToken.methods.addUser(userTokens);
     tokens.session_id = result.id;
+    tokens.tariff = user.get('tariff');
   } catch(err) {
     return next(err);
   }
