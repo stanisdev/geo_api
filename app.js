@@ -5,11 +5,13 @@ const glob = require('glob');
 const path = require('path');
 const configPath = path.join(__dirname + '/config/config');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const app = express();
 const config = require(configPath);
 
 app.use(helmet());
+app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
