@@ -70,7 +70,7 @@ class AccountsFilter {
    * Check free account limit on requests
    */
   async checkFreeAccountRequestsLimit() {
-    const from = +this.userTokens.property('сounting_requests_from');  // 3600000 - час
+    const from = +this.userTokens.property('сounting_requests_from');
     const counter = +this.userTokens.property('request_counter');
     if (this.now >= (from + 3600000)) { // Обновим метку отсчета (запросов в час)
       await this.extendRequestCounting();
